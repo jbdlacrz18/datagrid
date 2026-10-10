@@ -57,7 +57,7 @@ Open your Vercel URL → you'll land on **/login.php** → click **Create an acc
 {
   "version": 2,
   "builds": [
-    { "src": "*.php", "use": "vercel-php@0.7.0", "config": { "includeFiles": "**" } }
+    { "src": "*.php", "use": "vercel-php@0.9.0", "config": { "includeFiles": "**" } }
   ],
   "routes": [
     { "src": "/", "dest": "/index.php" },

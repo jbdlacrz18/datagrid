@@ -39,6 +39,15 @@ function get_db(): PDO
         parse_str($p['query'] ?? '', $q);
         $ssl = $q['sslmode'] ?? 'require';
         $dsn = "pgsql:host=$host;port=$port;dbname=$name;sslmode=$ssl";
+        // Neon serves many endpoints behind one address and uses TLS SNI to route.
+        // The runtime's libpq may not send SNI, so pass the endpoint id explicitly
+        // (see https://neon.com/sni). Honor an explicit ?options= in the URL, else
+        // derive it from the hostname's first label (minus any -pooler suffix).
+        if (!empty($q['options'])) {
+            $dsn .= ';options=' . $q['options'];
+        } elseif (preg_match('/^(ep-[^.]+?)(?:-pooler)?\./', $host, $m)) {
+            $dsn .= ';options=endpoint=' . $m[1];
+        }
         $db = new PDO($dsn, $user, $pass, $opts);
     } else {
         if (!is_dir(DATA_DIR)) mkdir(DATA_DIR, 0777, true);
